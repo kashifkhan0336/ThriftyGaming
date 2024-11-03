@@ -4,3 +4,9 @@ export interface IProduct {
     description: string;
     image: string;
 }
+
+export interface ICreateProduct {
+    title: string;
+    description: string;
+    image: string;
+}
