@@ -1,31 +1,19 @@
-import { ICreateProduct, IProduct } from './interfaces/product';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { ICreateProduct } from './interfaces/product';
 import { Injectable } from '@nestjs/common';
+import { Product } from '../entities/product.entity';
+import { EntityRepository } from '@mikro-orm/sqlite';
 
 @Injectable()
 export class ProductsService {
-    private readonly products: IProduct[] = [
-        {
-            id: 1,
-            title: 'Product 1',
-            description: 'My product description',
-            image: 'image-1.png',
-        },
-        {
-            id: 2,
-            title: 'Product 2',
-            description: 'My product description',
-            image: 'image-2.png',
-        },
-        {
-            id: 3,
-            title: 'Product 3',
-            description: 'My product description',
-            image: 'image-3.png',
-        },
-    ];
+    constructor(
+        @InjectRepository(Product)
+        private readonly productRepo: EntityRepository<Product>,
+    ) {}
 
-    async getAll() {
-        return this.products;
+    async get() {
+        const products = await this.productRepo.findAll();
+        return products;
     }
 
     /*
@@ -38,9 +26,16 @@ export class ProductsService {
      * the payload, so the DTO is un-necessary. Also, the interfaces are removed
      * during runtime (may impact memory xd)
      * */
+
     async create(productData: ICreateProduct) {
-        const productId = this.products.length + 1;
-        this.products.push({ ...productData, id: productId });
+        // 1. Validate product data
+        if (!productData) {
+            throw new Error('Data not provided');
+        }
+
+        // 2. Add in database
+        const newProduct = await this.productRepo.insert(productData);
+        return newProduct;
     }
 
     async update() {}

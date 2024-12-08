@@ -1,3 +1,9 @@
+/*
+ * Entities are used to define database tables and columns
+ * Other than that, they don't have any other use-case
+ * (according to my current knowledge of NestJs)
+ */
+
 import { Entity, Property, PrimaryKey } from '@mikro-orm/core';
 
 @Entity()
