@@ -1,14 +1,16 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CreateProductDTO } from './dto/create-product.dto';
+import { Body, Controller, Get, Post, UsePipes } from '@nestjs/common';
+import { CreateProductDto } from '../schemas/product.schema';
 import { ProductsService } from './products.service';
+import { ZodValidationPipe } from '../pipelines/ZodValidationPipe';
+import { createProductSchema } from '../schemas/product.schema';
 
 @Controller('products')
 export class ProductsController {
     constructor(private services: ProductsService) {}
 
     @Get()
-    async getProducts() {
-        return this.services.getAll();
+    async get() {
+        return this.services.get();
     }
 
     /*
@@ -17,11 +19,12 @@ export class ProductsController {
      * Nestjs uses this DTO object to validate the incoming request payload
      * through its ValidationPipeline and external packages like
      * class-transformer class-validator
+     * Here, we are using Schema-based validation with Zod.
      */
     @Post()
-    async createProduct(@Body() createProductDto: CreateProductDTO) {
-        console.log(createProductDto);
+    @UsePipes(new ZodValidationPipe(createProductSchema))
+    async create(@Body() createProductDto: CreateProductDto) {
         this.services.create(createProductDto);
-        return 'hello';
+        return { message: 'Product created' };
     }
 }
