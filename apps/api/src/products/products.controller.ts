@@ -23,8 +23,8 @@ export class ProductsController {
      */
     @Post()
     @UsePipes(new ZodValidationPipe(createProductSchema))
-    async create(@Body() createProductDto: CreateProductDto) {
-        this.services.create(createProductDto);
-        return { message: 'Product created' };
+    async create(@Body() productData: CreateProductDto) {
+        const product = this.services.create(productData);
+        return product;
     }
 }
